@@ -1,0 +1,62 @@
+{
+  "chapter": "ch05",
+  "title": "函数 - 练习题",
+  "difficulty": "intermediate",
+  "questions": [
+    {
+      "id": "q5_1",
+      "type": "choice",
+      "question": "以下关于箭头函数的描述，哪个是**错误**的？",
+      "options": [
+        "A. 箭头函数没有自己的 this",
+        "B. 箭头函数可以用作构造函数",
+        "C. 箭头函数不能使用 arguments 对象",
+        "D. 箭头函数不能使用 yield"
+      ],
+      "answer": "B",
+      "explanation": "箭头函数没有 [[Construct]] 内部方法，不能用作构造函数。使用 new 调用箭头函数会抛出 TypeError。"
+    },
+    {
+      "id": "q5_2",
+      "type": "choice",
+      "question": "以下代码输出什么？\n\nfunction outer() {\n  let count = 0;\n  return function() { return ++count; };\n}\nconst fn1 = outer();\nconst fn2 = outer();\nconsole.log(fn1());\nconsole.log(fn1());\nconsole.log(fn2());",
+      "options": [
+        "A. 1 2 1",
+        "B. 1 2 3",
+        "C. 1 1 1",
+        "D. 0 1 2"
+      ],
+      "answer": "A",
+      "explanation": "outer() 每次调用都创建一个新的闭包环境。fn1 和 fn2 各自拥有独立的 count 变量。fn1() 返回1，fn1() 再返回2，fn2() 返回的是 fn2 自己闭包中的 count(从0开始)，所以是1。"
+    },
+    {
+      "id": "q5_3",
+      "type": "programming",
+      "question": "编写一个函数 `memoize(fn)`，返回 fn 的带缓存版本。相同的参数只计算一次，再次调用时直接返回缓存的结果。",
+      "template": "function memoize(fn) {\n  // 在这里写代码\n}\n\nconst factorial = memoize(function(n) {\n  if (n <= 1) return 1;\n  return n * factorial(n - 1);\n});\n\nconsole.log(factorial(5));  // 120\nconsole.log(factorial(5));  // 120（从缓存返回）",
+      "test_cases": [
+        {"input": [5], "expected": 120}
+      ]
+    },
+    {
+      "id": "q5_4",
+      "type": "fill_blank",
+      "question": "this 的四种绑定规则，优先级从高到低依次是：\n1. ____ 绑定\n2. ____ 绑定 (call/apply/bind)\n3. ____ 绑定 (obj.method())\n4. ____ 绑定（严格模式下 this = undefined）",
+      "answer": ["new", "显式", "隐式", "默认"],
+      "explanation": "优先级：new > 显式绑定(call/apply/bind) > 隐式绑定(obj.method()) > 默认绑定。箭头函数的 this 不遵循这四条规则。"
+    },
+    {
+      "id": "q5_5",
+      "type": "choice",
+      "question": "以下代码输出什么？\n\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}",
+      "options": [
+        "A. 0 1 2",
+        "B. 3 3 3",
+        "C. undefined undefined undefined",
+        "D. 报错"
+      ],
+      "answer": "B",
+      "explanation": "var 是函数作用域，循环结束后 i = 3。三个 setTimeout 的回调都引用同一个 i，当它们执行时 i 已经是 3 了。将 var 改为 let 可得到 0 1 2。"
+    }
+  ]
+}

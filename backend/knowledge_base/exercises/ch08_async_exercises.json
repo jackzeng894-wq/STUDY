@@ -1,0 +1,58 @@
+{
+  "chapter": "ch08",
+  "title": "异步编程 - 练习题",
+  "difficulty": "advanced",
+  "questions": [
+    {
+      "id": "q8_1",
+      "type": "choice",
+      "question": "以下代码输出顺序是什么？\n\nconsole.log('A');\nsetTimeout(() => console.log('B'), 0);\nPromise.resolve().then(() => console.log('C'));\nconsole.log('D');",
+      "options": ["A. A D C B", "B. A D B C", "C. A C D B", "D. D A C B"],
+      "answer": "A",
+      "explanation": "同步代码先执行(A, D)。然后清空微任务队列(C)。最后取一个宏任务执行(B)。事件循环顺序：同步 → 微任务 → 宏任务。"
+    },
+    {
+      "id": "q8_2",
+      "type": "choice",
+      "question": "以下代码输出什么？\n\nasync function foo() {\n  console.log('X');\n  await Promise.resolve();\n  console.log('Y');\n}\nfoo();\nconsole.log('Z');",
+      "options": ["A. X Y Z", "B. X Z Y", "C. Z X Y", "D. Y X Z"],
+      "answer": "B",
+      "explanation": "foo() 中的同步代码 X 先执行。await 之后的代码(Y)被包装为微任务。接着执行 Z(同步)，然后微任务 Y 执行。"
+    },
+    {
+      "id": "q8_3",
+      "type": "programming",
+      "question": "实现一个 `delay(ms)` 函数，返回一个在 ms 毫秒后 resolve 的 Promise。然后用 async/await 实现一个倒计时：每秒输出一个数字，从 5 倒数到 0，最后输出"发射！"。",
+      "template": "function delay(ms) {\n  // 在这里实现\n}\n\nasync function countdown() {\n  // 在这里实现\n}\n\ncountdown();",
+      "test_cases": []
+    },
+    {
+      "id": "q8_4",
+      "type": "choice",
+      "question": "Promise.all([p1, p2, p3]) 的行为是？",
+      "options": [
+        "A. 三个 Promise 串行执行，全部成功才成功",
+        "B. 三个 Promise 并行执行，全部成功才成功，有一个失败就立即失败",
+        "C. 三个 Promise 并行执行，返回第一个完成的",
+        "D. 三个 Promise 串行执行，返回最后一个的"
+      ],
+      "answer": "B",
+      "explanation": "Promise.all 并发执行所有 Promise。全部成功 → 返回结果数组；任一失败 → 立即 reject 为那个错误。注意传入时 Promise 已经在执行了，不是 Promise.all 启动了它们。"
+    },
+    {
+      "id": "q8_5",
+      "type": "choice",
+      "question": "以下哪些属于微任务（MicroTask）？",
+      "options": [
+        "A. setTimeout 回调",
+        "B. Promise.then 回调",
+        "C. queueMicrotask 回调",
+        "D. MutationObserver 回调",
+        "E. setInterval 回调"
+      ],
+      "answer": ["B", "C", "D"],
+      "explanation": "微任务：Promise.then/catch/finally、queueMicrotask、MutationObserver、await 后面的代码。宏任务：setTimeout、setInterval、I/O、UI 渲染。",
+      "multi": true
+    }
+  ]
+}
