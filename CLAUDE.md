@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 开发状态
 
-**后端**：5个Crew、14个Agent、6个Service、7组API端点（36路由），全部实现并导入通过。
+**后端**：5个Crew、14个Agent、8个Service、7组API端点（36路由），全部实现并导入通过。
 **前端**：9个页面、路由鉴权、SSE流式对话、JWT登录注册，TypeScript编译通过。
 **数据库**：SQLite（关系数据）+ ChromaDB（向量存储），零系统依赖，已验证运行。
 **已验证 API**：注册(201) / 登录(200+JWT) / 知识搜索(200,3条结果) / 健康检查(200)。
@@ -64,10 +64,11 @@ npm run build                         # 生产构建（vue-tsc + vite）
 
 核心依赖方向：上层可调下层，下层绝不引上层。Domain 层（agents/、rag/）不依赖 Infrastructure（models/、iflytek/）。
 
-**7 个 Service 及其职责**：
+**8 个 Service 及其职责**：
 
 | Service | 职责 | 调用关系 |
 |---------|------|----------|
+| `conversation_service.py` | 对话路由分发 | 按 conversation_type 路由到 ProfileService / TutoringService |
 | `profile_service.py` | 画像对话编排 | 触发 ProfileCrew → 解析输出 → 更新画像 |
 | `resource_service.py` | 资源生成编排 | RAG检索 → ResourceCrew → 审核-重试(≤2次) → 持久化 → SSE |
 | `path_service.py` | 路径规划编排 | 调 graph_service 算图 → 触发 PathCrew → 组装路径 |
@@ -147,6 +148,8 @@ npm run build                         # 生产构建（vue-tsc + vite）
 | `frontend/src/composables/useStreamingMarkdown.ts` | Markdown 流式渲染（50ms 防抖 + highlight.js） |
 | `frontend/src/api/client.ts` | Axios 实例 + JWT 拦截器 + 7组 API 封装 |
 | `frontend/src/router/index.ts` | 路由表 + beforeEach 鉴权守卫 |
+| `frontend/src/components/chat/` | 对话组件：MessageList / MessageInput / MarkdownRenderer / AgentThinkingIndicator |
+| `frontend/src/components/profile/` | 画像组件：DimensionGrid / ProfileSnapshot |
 | `frontend/src/pages/ConversationPage.vue` | 核心对话页（SSE流式 + Agent状态 + 多对话类型） |
 | `frontend/src/pages/LoginPage.vue` | 登录/注册页（JWT + Naive UI Tabs） |
 | `frontend/src/pages/DashboardPage.vue` | 仪表盘（evaluation API 真实数据） |
@@ -174,7 +177,6 @@ LITELLM_LOCAL_MODEL_COST_MAP=True           # 避免 LiteLLM 远程拉取超时
 - **密码哈希**：直接使用 `bcrypt.hashpw` / `bcrypt.checkpw`，不要引入 `passlib`（与新版 bcrypt 不兼容）。
 - **模型下载**：国内环境设置 `HF_ENDPOINT=https://hf-mirror.com`，否则 SentenceTransformer 无法下载。
 - **LiteLLM**：设置 `LITELLM_LOCAL_MODEL_COST_MAP=True` 避免启动时远程拉取超时（~10秒卡顿）。
-- **Git 状态**：本项目当前不在 Git 仓库中。初始化时 `.env` 不要提交，`.env.example` 可提交。
 
 ## Agent skills
 
